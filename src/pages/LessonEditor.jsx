@@ -1,33 +1,64 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { createLesson } from "../utils/lessonsApi";
+import { createLesson, getLesson, updateLesson } from "../utils/lessonsApi";
 
 export default function LessonEditor() {
+  const { id: courseId, lessonId } = useParams();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [order, setOrder] = useState(1);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const navigate = useNavigate();
-  const { id } = useParams(); // courseId from URL
+
+  useEffect(() => {
+    if (!lessonId) return;
+    setLoading(true);
+    getLesson(courseId, lessonId)
+      .then((l) => {
+        if (l) {
+          setTitle(l.title);
+          setContent(l.content);
+          setOrder(l.order);
+        }
+      })
+      .finally(() => setLoading(false));
+  }, [courseId, lessonId]);
 
   const saveLesson = async () => {
     if (!title.trim() || !content.trim()) return alert("Title and content required!");
     setSaving(true);
     try {
-      await createLesson(id, { title, content, order });
-      navigate(`/courses/${id}`); // go back to course
+      if (lessonId) {
+        await updateLesson(courseId, lessonId, { title, content, order });
+      } else {
+        await createLesson(courseId, { title, content, order });
+      }
+      navigate(`/courses/${courseId}`);
     } catch (error) {
-      console.error("Error creating lesson:", error);
-      alert("Failed to create lesson");
+      console.error("Error saving lesson:", error);
+      alert("Failed to save lesson");
     } finally {
       setSaving(false);
     }
   };
 
+  if (loading) return <p>Loading lesson...</p>;
+
   return (
     <div style={{ maxWidth: 600 }}>
-      <h2 className="text-primary mb-3">Create Lesson</h2>
+      {/* ✅ Back button */}
+      <button
+        className="btn btn-outline-secondary mb-3"
+        onClick={() => navigate(`/courses/${courseId}`)}
+      >
+        ← Back to Course
+      </button>
+
+      <h2 className="text-primary mb-3">
+        {lessonId ? "Edit Lesson" : "Create Lesson"}
+      </h2>
 
       <label className="form-label">Title</label>
       <input

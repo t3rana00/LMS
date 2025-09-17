@@ -61,6 +61,7 @@ export default function App() {
               <Route path="/courses/new" element={user ? <CourseEditor /> : <Navigate to="/login" />} />
               <Route path="/courses/:id" element={user ? <CourseOverview /> : <Navigate to="/login" />} />
               <Route path="/courses/:id/lessons/new" element={<LessonEditor />} />
+<Route path="/courses/:id/lessons/:lessonId/edit" element={<LessonEditor />} />
             </Routes>
           </div>
         </div>
