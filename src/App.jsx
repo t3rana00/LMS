@@ -8,6 +8,7 @@ import Signup from "./pages/Signup";
 import CourseList from "./pages/CourseList";
 import CourseEditor from "./pages/CourseEditor";
 import CourseOverview from "./pages/CourseOverview";
+import LessonEditor from "./pages/LessonEditor";
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -59,6 +60,7 @@ export default function App() {
               <Route path="/courses" element={user ? <CourseList /> : <Navigate to="/login" />} />
               <Route path="/courses/new" element={user ? <CourseEditor /> : <Navigate to="/login" />} />
               <Route path="/courses/:id" element={user ? <CourseOverview /> : <Navigate to="/login" />} />
+              <Route path="/courses/:id/lessons/new" element={<LessonEditor />} />
             </Routes>
           </div>
         </div>
